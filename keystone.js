@@ -1,8 +1,9 @@
-// Note it's checking the regex against an absoloute path
+// Load the babel-register plugin for the graphql directory
+// Note this checks the regex against an absoloute path
 require('babel-register')({ only: /\/graphql\/.*/ });
 
-// Load .env for development environments
-require('dotenv').load();
+// Load .env config for development environments
+require('dotenv').config({ silent: true });
 
 // Initialise New Relic if an app name and license key exists
 if (process.env.NEW_RELIC_APP_NAME && process.env.NEW_RELIC_LICENSE_KEY) {
@@ -49,8 +50,7 @@ keystone.init({
 	'ga property': process.env.GA_PROPERTY,
 	'ga domain': process.env.GA_DOMAIN,
 
-	'chartbeat property': process.env.CHARTBEAT_PROPERTY,
-	'chartbeat domain': process.env.CHARTBEAT_DOMAIN,
+	'cloudinary secure': true,
 
 	'basedir': __dirname
 
@@ -61,7 +61,7 @@ keystone.import('models');
 keystone.set('routes', require('./routes'));
 
 keystone.set('locals', {
-	_: require('underscore'),
+	_: require('lodash'),
 	moment: require('moment'),
 	js: 'javascript:;',
 	env: keystone.get('env'),
@@ -70,9 +70,7 @@ keystone.set('locals', {
 	editable: keystone.content.editable,
 	google_api_key: keystone.get('google api key'),
 	ga_property: keystone.get('ga property'),
-	ga_domain: keystone.get('ga domain'),
-	chartbeat_property: keystone.get('chartbeat property'),
-	chartbeat_domain: keystone.get('chartbeat domain')
+	ga_domain: keystone.get('ga domain')
 });
 
 keystone.set('email locals', {

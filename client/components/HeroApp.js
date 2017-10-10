@@ -19,7 +19,7 @@ var HeroApp = React.createClass({
 	},
 
 	componentWillUnmount: function() {
-		RSVPStore.removeChangeListener(this.updateStoreFromState);
+		RSVPStore.removeChangeListener(this.updateStateFromStore);
 	},
 
 	updateStateFromStore: function() {
@@ -37,7 +37,7 @@ var HeroApp = React.createClass({
 
 	renderWelcome: function() {
 		if (this.state.rsvp.attending) {
-			return <h4 className="hero-button-title"><span className = "welcome-message">See you there!</span></h4>
+			return <h4 className="hero-button-title"><span className = "welcome-message">We have your RSVP</span></h4>
 		} else {
 			return <h4 className="hero-button-title">Are you coming? <br /> <span className="spots-left">{this.state.meetup.remainingRSVPs}<span className="text-thin"> spots left</span></span><br /></h4>
 		}
@@ -77,11 +77,13 @@ var HeroApp = React.createClass({
 				{this.renderWelcome()}
 				<div className="hero-button">
 					<div id="next-meetup" data-id={this.state.meetup._id} className="form-row meetup-toggle">
-						<div className="col-xs-6">
-							<button type="button" onClick={this.toggleRSVP.bind(this, true)} className={"btn btn-lg btn-block btn-default js-rsvp-attending" + attending}>Yes</button>
+						<div className="col-xs-8">
+							<button type="button" onClick={this.toggleRSVP.bind(this, true)} className={"btn btn-lg btn-block btn-default js-rsvp-attending " + attending}>
+								<span>You're coming!</span>
+							</button>
 						</div>
-						<div className="col-xs-6">
-							<button type="button" onClick={this.toggleRSVP.bind(this, false)} className={"btn btn-lg btn-block btn-default js-rsvp-decline" + notAttending}>No</button>
+						<div className="col-xs-4">
+							<button type="button" onClick={this.toggleRSVP.bind(this, false)} className={"btn btn-lg btn-block btn-default btn-decline js-rsvp-decline " + notAttending}>Can't make it?</button>
 						</div>
 					</div>
 				</div>
@@ -118,18 +120,18 @@ var HeroApp = React.createClass({
 		if (this.state.isBusy) {
 			return this.renderBusy();
 		}
-		if (this.state.user) {
-			if (this.state.meetup.rsvpsAvailable) {
-				if (this.state.rsvp.exists) {
-					return this.renderRSVPToggle();
-				} else {
-					return this.renderRSVPButton();
-				}
-			} else {
-				return this.renderNoMoreTickets();
-			}
+
+		var hasUser = !!this.state.user;
+		var isRsvpOpen = this.state.meetup.rsvpsAvailable;
+		var hasRsvped = this.state.rsvp.exists;
+		var isAttending = this.state.rsvp.attending;
+
+		if (!isRsvpOpen) {
+			return hasUser && isAttending ? this.renderRSVPToggle() : this.renderNoMoreTickets();
+		} else if (hasUser) {
+			return hasRsvped ? this.renderRSVPToggle() : this.renderRSVPButton();
 		} else {
-			return this.state.meetup.rsvpsAvailable ? this.renderRSVPSignin() : this.renderNoMoreTickets();
+			return this.renderRSVPSignin();
 		}
 	},
 });
